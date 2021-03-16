@@ -146,7 +146,7 @@ namespace TestSysplan.API.Controllers.V1
                 }
                 else if (service.Delete(uuid))
                 {
-                    return NoContent();
+                    return Ok();
                 }
 
                 return BadRequest("Was not possible to remove value!");
