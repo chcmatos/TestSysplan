@@ -18,7 +18,7 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         public ServiceBase(Context context, DbSet<Entity> dbSet)
         {
-            this.dbContext    = context ?? throw new ArgumentNullException(nameof(context));
+            this.dbContext  = context ?? throw new ArgumentNullException(nameof(context));
             this.dbSet      = dbSet ?? throw new ArgumentNullException(nameof(dbSet));
         }
 
@@ -46,9 +46,10 @@ namespace TestSysplan.Core.Infrastructure.Services
                 .Any(c => c.Uuid == e.Uuid);
         }
 
-        public Entity Get(int id)
+        public Entity Get(long id)
         {
             Entity found = dbSet.Find(id);
+            if(found != null) dbContext.Entry(found).State = EntityState.Detached;
             return found;
         }
 
@@ -148,9 +149,26 @@ namespace TestSysplan.Core.Infrastructure.Services
         {
             foreach(Entity e in entity)
             {
-                Entity curr = dbSet.Local.FirstOrDefault(e.EqualsAnyId);
-                yield return curr ?? e;
+                Entity curr = dbSet.Local.FirstOrDefault(e.EqualsAnyId);                
+                if(curr != null || (e.Id == default && (curr = Get(e.Uuid)) != null))
+                {
+                    yield return curr;
+                }
+                else if(e.Id == default)
+                {
+                    #if DEBUG
+                    throw new InvalidOperationException($"Entity \"{typeof(Entity).Name}\" is untrackable, " +
+                        $"thus can not be attached to delete!");
+                    #else
+                    continue;
+                    #endif
+                }
+                else
+                {
+                    yield return e;
+                }
             }
+
         }
 
         public int Delete(IEnumerable<Guid> id)

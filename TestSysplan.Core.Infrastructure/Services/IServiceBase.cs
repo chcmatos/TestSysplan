@@ -10,7 +10,7 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         bool Exists(Entity e);
 
-        Entity Get(int id);
+        Entity Get(long id);
 
         Entity Get(Guid uuid);
 

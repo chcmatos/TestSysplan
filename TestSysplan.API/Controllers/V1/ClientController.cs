@@ -29,13 +29,20 @@ namespace TestSysplan.API.Controllers.V1
 
         #region [R]ead
         [HttpGet]
-        public IEnumerable<Client> Get()
+        public IActionResult Get()
         {
-            return service.List();
+            var clients = service.List();
+
+            if(clients.Count == 0)
+            {
+                return NoContent();
+            }
+
+            return new JsonResult(clients);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public IActionResult Get(long id)
         {
             var client = service.Get(id);
 
@@ -47,7 +54,7 @@ namespace TestSysplan.API.Controllers.V1
             return new JsonResult(client);
         }
 
-        [HttpGet("{uuid}")]
+        [HttpGet("uuid/{uuid}")]
         public IActionResult Get(Guid uuid)
         {
             var client = service.Get(uuid);
