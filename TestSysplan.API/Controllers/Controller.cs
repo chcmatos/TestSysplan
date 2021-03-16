@@ -21,11 +21,11 @@ namespace TestSysplan.API.Controllers
 
         #region [C]reate
         [HttpPost]
-        public IActionResult Create([FromBody] Model client)
+        public IActionResult Create([FromBody] Model result)
         {
             try
             {
-                return new JsonResult(service.Insert(client));
+                return new JsonResult(service.Insert(result));
             }
             catch (Exception ex)
             {
@@ -36,18 +36,18 @@ namespace TestSysplan.API.Controllers
 
         #region [R]ead
         [HttpGet]
-        public IActionResult Get()
+        public virtual IActionResult Get()
         {
             try
             {
-                var clients = service.List();
+                var result = service.List();
 
-                if (clients.Count == 0)
+                if (result.Count == 0)
                 {
                     return NoContent();
                 }
 
-                return new JsonResult(clients);
+                return new JsonResult(result);
             }
             catch (Exception ex)
             {
@@ -56,18 +56,18 @@ namespace TestSysplan.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(long id)
+        public virtual IActionResult Get(long id)
         {
             try
             {
-                var client = service.Get(id);
+                var result = service.Get(id);
 
-                if (client == null)
+                if (result == null)
                 {
                     return NotFound();
                 }
 
-                return new JsonResult(client);
+                return new JsonResult(result);
             }
             catch (Exception ex)
             {
@@ -76,16 +76,16 @@ namespace TestSysplan.API.Controllers
         }
 
         [HttpGet("uuid/{uuid}")]
-        public IActionResult Get(Guid uuid)
+        public virtual IActionResult Get(Guid uuid)
         {
             try
             {
-                var client = service.Get(uuid);
-                if (client == null)
+                var result = service.Get(uuid);
+                if (result == null)
                 {
                     return NotFound();
                 }
-                return new JsonResult(client);
+                return new JsonResult(result);
             }
             catch (Exception ex)
             {
@@ -94,18 +94,18 @@ namespace TestSysplan.API.Controllers
         }
 
         [HttpGet("page/{page}/{limit:int?}")]
-        public IActionResult Paging(int page, int limit = -1)
+        public virtual IActionResult Paging(int page, int limit = -1)
         {
             try
             {
-                var client = service.Paging(page, limit);
+                var result = service.Paging(page, limit);
 
-                if (client.Count == 0)
+                if (result.Count == 0)
                 {
                     return NotFound();
                 }
 
-                return new JsonResult(client);
+                return new JsonResult(result);
             }
             catch (Exception ex)
             {
@@ -116,13 +116,13 @@ namespace TestSysplan.API.Controllers
 
         #region [U]pdate
         [HttpPut]
-        public IActionResult Update([FromBody] Model client)
+        public IActionResult Update([FromBody] Model result)
         {
             try
             {
-                if (service.Exists(client))
+                if (service.Exists(result))
                 {
-                    service.Update(client);
+                    service.Update(result);
                     return Ok();
                 }
 
