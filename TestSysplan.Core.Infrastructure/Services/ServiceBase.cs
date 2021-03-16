@@ -135,7 +135,6 @@ namespace TestSysplan.Core.Infrastructure.Services
                 dbContext.Entry(curr)
                     .CurrentValues
                     .SetValues(entity);
-
             }
             else
             {
@@ -171,26 +170,28 @@ namespace TestSysplan.Core.Infrastructure.Services
                     yield return e;
                 }
             }
-
         }
 
-        public int Delete(IEnumerable<Guid> id)
+        private int DeleteLocal(IEnumerable<Guid> uuids)
         {
-            var entity = AttachRangeNonExists(id.Select(i => new Entity() { Uuid = i })).ToList();
+            var entity = AttachRangeNonExists(uuids.Select(i => new Entity() { Uuid = i })).ToList();
             dbSet.RemoveRange(entity);
             return Math.Min(dbContext.SaveChanges(), entity.Count);
         }
 
-        public int Delete(params Guid[] uuid)
+        public int Delete(IEnumerable<Guid> uuids)
         {
-            var entity = AttachRangeNonExists(uuid.Select(i => new Entity() { Uuid = i })).ToList();
-            dbSet.RemoveRange(entity);
-            return Math.Min(dbContext.SaveChanges(), entity.Count);
+            return DeleteLocal(uuids);
+        }
+
+        public int Delete(params Guid[] args)
+        {
+            return DeleteLocal(args);
         }
 
         public bool Delete(Guid uuid)
         {
-            return Delete(new Guid[] { uuid }) == 1;
+            return DeleteLocal(new Guid[] { uuid }) == 1;
         }
 
         public bool Delete(IEnumerable<Entity> entity)
