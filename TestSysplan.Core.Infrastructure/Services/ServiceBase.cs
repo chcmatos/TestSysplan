@@ -59,6 +59,7 @@ namespace TestSysplan.Core.Infrastructure.Services
                 .AsNoTracking()
                 .Where(t => t.Uuid == uuid)
                 .Take(1)
+                .OrderBy(e => e.Id)
                 .FirstOrDefault();
         }
 
@@ -77,6 +78,7 @@ namespace TestSysplan.Core.Infrastructure.Services
                 .AsNoTracking()
                 .Skip(index)
                 .Take(count)
+                .OrderBy(e => e.Id)
                 .ToList();
         }
 
@@ -121,6 +123,7 @@ namespace TestSysplan.Core.Infrastructure.Services
                 curr = dbSet
                    .Where(t => t.Uuid == entity.Uuid)
                    .Take(1)
+                   .OrderBy(e => e.Id)
                    .FirstOrDefault();
 
                 if (curr == null)
