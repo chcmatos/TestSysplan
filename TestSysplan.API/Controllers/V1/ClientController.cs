@@ -21,9 +21,16 @@ namespace TestSysplan.API.Controllers.V1
 
         #region [C]reate
         [HttpPost]
-        public Client Create([FromBody] Client client)
+        public IActionResult Create([FromBody] Client client)
         {
-            return service.Insert(client);
+            try
+            {
+                return new JsonResult(service.Insert(client));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         #endregion
 
@@ -31,53 +38,79 @@ namespace TestSysplan.API.Controllers.V1
         [HttpGet]
         public IActionResult Get()
         {
-            var clients = service.List();
-
-            if(clients.Count == 0)
+            try
             {
-                return NoContent();
-            }
+                var clients = service.List();
 
-            return new JsonResult(clients);
+                if (clients.Count == 0)
+                {
+                    return NoContent();
+                }
+
+                return new JsonResult(clients);
+            } 
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("{id}")]
         public IActionResult Get(long id)
         {
-            var client = service.Get(id);
-
-            if(client == null)
+            try
             {
-                return NotFound();
-            }
+                var client = service.Get(id);
 
-            return new JsonResult(client);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+
+                return new JsonResult(client);
+            } 
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("uuid/{uuid}")]
         public IActionResult Get(Guid uuid)
         {
-            var client = service.Get(uuid);
-
-            if (client == null)
+            try
             {
-                return NotFound();
+                var client = service.Get(uuid);
+                if (client == null)
+                {
+                    return NotFound();
+                }
+                return new JsonResult(client);
             }
-            
-            return new JsonResult(client);
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpGet("page/{page}/{limit:int?}")]
         public IActionResult Paging(int page, int limit = -1)
         {
-            var client = service.Paging(page, limit);
-
-            if (client.Count == 0)
+            try
             {
-                return NotFound();
-            }
+                var client = service.Paging(page, limit);
 
-            return new JsonResult(client);
+                if (client.Count == 0)
+                {
+                    return NotFound();
+                }
+
+                return new JsonResult(client);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         #endregion
 
