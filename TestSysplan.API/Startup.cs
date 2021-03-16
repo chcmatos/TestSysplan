@@ -9,33 +9,40 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
+using System.Collections.Concurrent;
 using TestSysplan.Core.Infrastructure.Context;
 
 namespace TestSysplan.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
+        private readonly ConcurrentBag<string> versions;
 
         public IConfiguration Configuration { get; }
 
+        public Startup(IConfiguration configuration)
+        {
+            this.Configuration = configuration;
+            this.versions = new ConcurrentBag<string>();
+        }
+
         private void AddSwaggerDoc(SwaggerGenOptions options)
         {
-            options.SwaggerDoc("v1", new OpenApiInfo
+            while (versions.TryTake(out string v))
             {
-                Version = "v1",
-                Title = Configuration["SwaggerDoc:Title"],
-                Description = Configuration["SwaggerDoc:Description"],
-                Contact = new OpenApiContact
+                options.SwaggerDoc(v, new OpenApiInfo
                 {
-                    Name = Configuration["SwaggerDoc:Author:Name"],
-                    Email = Configuration["SwaggerDoc:Author:Email"],
-                    Url = new Uri(Configuration["SwaggerDoc:Author:Url"]),
-                }
-            });
+                    Version = v,
+                    Title = Configuration["SwaggerDoc:Title"],
+                    Description = Configuration["SwaggerDoc:Description"],
+                    Contact = new OpenApiContact
+                    {
+                        Name = Configuration["SwaggerDoc:Author:Name"],
+                        Email = Configuration["SwaggerDoc:Author:Email"],
+                        Url = new Uri(Configuration["SwaggerDoc:Author:Url"]),
+                    }
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -90,6 +97,7 @@ namespace TestSysplan.API
                        c.SwaggerEndpoint(
                        $"/swagger/{desc.GroupName}/swagger.json",
                        desc.GroupName.ToUpperInvariant());
+                       versions.Add(desc.GroupName);
                    }                   
                    c.DocExpansion(DocExpansion.List);
                })
