@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using TestSysplan.Core.Infrastructure.Services;
 using TestSysplan.Core.Model;
 
