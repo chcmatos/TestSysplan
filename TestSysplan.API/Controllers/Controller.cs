@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Runtime.CompilerServices;
+using TestSysplan.Core.Infrastructure.Logger;
 using TestSysplan.Core.Infrastructure.Services;
 using TestSysplan.Core.Model;
 
@@ -12,12 +16,33 @@ namespace TestSysplan.API.Controllers
         where Model : ModelBase
         where Service : IServiceBase<Model>
     {
-        private readonly Service service;
-
-        public Controller(Service service)
+        private class EmptyLogger : ILogger<Controller<Model, Service>>, IDisposable
         {
-            this.service = service ?? throw new ArgumentNullException(nameof(service));
+            public IDisposable BeginScope<TState>(TState state)
+            {
+                return this;
+            }
+
+            public bool IsEnabled(LogLevel logLevel)
+            {
+                return false;
+            }
+
+            public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter) { }
+
+            void IDisposable.Dispose() { }
         }
+
+        protected readonly Service service;
+        protected readonly ILogger logger;
+
+        protected Controller(Service service, ILogger<Controller<Model, Service>> logger)
+        {
+            this.service    = service ?? throw new ArgumentNullException(nameof(service));
+            this.logger     = logger;
+        }
+
+        protected Controller(Service service) : this(service, new EmptyLogger()) { }
 
         #region [C]reate
         [HttpPost]
@@ -29,6 +54,7 @@ namespace TestSysplan.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -44,6 +70,7 @@ namespace TestSysplan.API.Controllers
 
                 if (result.Count == 0)
                 {
+                    logger.LogD("No Content");
                     return NoContent();
                 }
 
@@ -51,6 +78,7 @@ namespace TestSysplan.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -64,6 +92,7 @@ namespace TestSysplan.API.Controllers
 
                 if (result == null)
                 {
+                    logger.LogD("Id {0} NotFound", args: id);
                     return NotFound();
                 }
 
@@ -71,6 +100,7 @@ namespace TestSysplan.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -83,12 +113,14 @@ namespace TestSysplan.API.Controllers
                 var result = service.Get(uuid);
                 if (result == null)
                 {
+                    logger.LogD("Uuid {0} NotFound", args: uuid);
                     return NotFound();
                 }
                 return new JsonResult(result);
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -102,6 +134,8 @@ namespace TestSysplan.API.Controllers
 
                 if (result.Count == 0)
                 {
+                    logger.LogD("Page {0} limited to {1} NotFound", 
+                        args: new object[] { page, limit });
                     return NotFound();
                 }
 
@@ -109,6 +143,7 @@ namespace TestSysplan.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -130,6 +165,7 @@ namespace TestSysplan.API.Controllers
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -143,6 +179,7 @@ namespace TestSysplan.API.Controllers
             {
                 if (!service.Exists(uuid))
                 {
+                    logger.LogD("Uuid {0} NotFound", args: uuid);
                     return NotFound();
                 }
                 else if (service.Delete(uuid))
@@ -150,10 +187,11 @@ namespace TestSysplan.API.Controllers
                     return Ok();
                 }
 
-                return BadRequest("Was not possible to remove value!");
+                throw new InvalidOperationException("Was not possible to remove value!");
             }
             catch (Exception ex)
             {
+                logger.LogE(ex);
                 return BadRequest(ex.Message);
             }
         }

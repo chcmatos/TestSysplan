@@ -51,6 +51,7 @@ namespace TestSysplan.API
             new ServiceProviderHelper(services)
                #region Infra
                .UseConfiguration(Configuration)
+               .UseLogWithElasticsearch()
                .UseLocalContextAsSqlServer()
                .UseServices()
                .UseConnectionKey("Local")

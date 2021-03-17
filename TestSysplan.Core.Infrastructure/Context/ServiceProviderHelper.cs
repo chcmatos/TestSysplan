@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using System.Linq;
+using TestSysplan.Core.Infrastructure.Logger;
 using TestSysplan.Core.Infrastructure.Services;
 
 namespace TestSysplan.Core.Infrastructure.Context
@@ -69,6 +70,7 @@ namespace TestSysplan.Core.Infrastructure.Context
 
         private readonly IServiceCollection services;
         private IConnectionKey connectionKey;
+        private IConfiguration configuration;
 
         public ServiceProviderHelper(IServiceCollection services)
         {
@@ -94,7 +96,7 @@ namespace TestSysplan.Core.Infrastructure.Context
 
         public ServiceProviderHelper UseConfiguration(IConfiguration configuration)
         {
-            services.AddSingleton(configuration);
+            services.AddSingleton(this.configuration = configuration);
             return this;
         }
 
@@ -104,9 +106,38 @@ namespace TestSysplan.Core.Infrastructure.Context
             return this;
         }
 
+        /// <summary>
+        /// Enable to use all own local services.
+        /// </summary>
+        /// <returns></returns>
         public ServiceProviderHelper UseServices()
         {
             this.services.UseServices();
+            return this;
+        }
+
+        /// <summary>
+        /// To use log with elasticsearch inputing configuration 
+        /// values, create into <i>appsettings.json</i> project 
+        /// the follow field:
+        /// <code>
+        /// "Elasticsearch": {<br/>
+        ///  "Url": "http://localhost:5151/elasticsearch",<br/>
+        ///  "Appname":  "YourAppNameInElasticsearch"<br/>
+        /// },
+        /// </code>
+        /// or create the follow simple field within only elasticsearch url,
+        /// then the app name will be the current execunting assembly name.
+        /// <code>
+        /// "Elasticsearch": "http://localhost:5151/elasticsearch"
+        /// </code>
+        /// </summary>
+        /// <param name="configuration">current configuration</param>
+        /// <returns></returns>
+        public ServiceProviderHelper UseLogWithElasticsearch(IConfiguration configuration = null)
+        {
+            this.services.UseLogWithElasticsearch(configuration ??
+                this.configuration ?? throw new InvalidOperationException("Configuration not set before it!"));
             return this;
         }
 
@@ -163,7 +194,14 @@ namespace TestSysplan.Core.Infrastructure.Context
 
         public ServiceProvider CreateServiceProvider()
         {
-            return GetServiceCollection().BuildServiceProvider();
+            try
+            {
+                return GetServiceCollection().BuildServiceProvider();
+            } finally
+            {
+                this.configuration = null;
+                this.connectionKey = null;
+            }
         }
 
         public IServiceScope CreateScope()

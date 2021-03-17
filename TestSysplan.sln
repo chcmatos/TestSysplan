@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.Core", "TestSys
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.Core.Infrastructure", "TestSysplan.Core.Infrastructure\TestSysplan.Core.Infrastructure.csproj", "{63E43013-F07A-46CD-AC0B-B87C7819796C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSysplan.API", "TestSysplan.API\TestSysplan.API.csproj", "{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.API", "TestSysplan.API\TestSysplan.API.csproj", "{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9DD2C921-C754-4533-8225-82AC540EEBF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
