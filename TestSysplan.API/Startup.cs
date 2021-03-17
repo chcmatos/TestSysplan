@@ -72,7 +72,7 @@ namespace TestSysplan.API
                #endregion
                
                #region Swagger               
-               .AddSwaggerGen(options => AddSwaggerDoc(options))
+               .AddSwaggerGen(AddSwaggerDoc)
                #endregion
                
                .AddControllers();
