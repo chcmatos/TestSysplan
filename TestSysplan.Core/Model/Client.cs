@@ -1,6 +1,6 @@
 ﻿namespace TestSysplan.Core.Model
 {
-    public class Client : AuditableModel
+    public partial class Client : AuditableModel
     {
         public string Name { get; set; }
 
