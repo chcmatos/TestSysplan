@@ -132,12 +132,10 @@ namespace TestSysplan.Core.Infrastructure.Context
         /// "Elasticsearch": "http://localhost:5151/elasticsearch"
         /// </code>
         /// </summary>
-        /// <param name="configuration">current configuration</param>
         /// <returns></returns>
-        public ServiceProviderHelper UseLogWithElasticsearch(IConfiguration configuration = null)
+        public ServiceProviderHelper UseLogWithElasticsearch()
         {
-            this.services.UseLogWithElasticsearch(configuration ??
-                this.configuration ?? throw new InvalidOperationException("Configuration not set before it!"));
+            this.services.UseLogWithElasticsearch();
             return this;
         }
 
