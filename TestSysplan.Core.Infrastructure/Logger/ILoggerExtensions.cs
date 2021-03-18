@@ -12,8 +12,6 @@ namespace TestSysplan.Core.Infrastructure.Logger
         #region Log base
         private delegate void LogAction(string message, object[] args);
 
-        private delegate void LogActionError(Exception error, string message, object[] args);
-        
         private static StringBuilder AppendLineIf(this StringBuilder sb, bool condition, params object[] value)
         {
             return condition ? value.Aggregate(sb, (acc, curr) => acc.Append(curr)).AppendLine() : sb;
@@ -38,7 +36,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
                 var st = new StackTrace(error, true);
                 var sf = st.GetFrame(st.FrameCount - 1);
                 errorLine = sf?.GetFileLineNumber() ?? errorLine;
-                stackTrace = error.StackTrace?.Replace(" at ", "\r\n\t\t└► at ");
+                stackTrace = error.StackTrace?.Replace(" at ", "\r\n\t\t└► at ", StringComparison.InvariantCultureIgnoreCase);
                 memberName = string.IsNullOrEmpty(memberName) ? sf?.GetMethod()?.Name : memberName;
                 sourceFile = string.IsNullOrEmpty(sourceFile) ? sf?.GetFileName() : sourceFile;
             }

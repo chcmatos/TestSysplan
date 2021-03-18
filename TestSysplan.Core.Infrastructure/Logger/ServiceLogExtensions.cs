@@ -21,7 +21,17 @@ namespace TestSysplan.Core.Infrastructure.Logger
             string elasticsearchUrl, 
             string appName)
         {
-           Serilog.Log.Logger = new LoggerConfiguration()
+
+            if(string.IsNullOrEmpty(elasticsearchUrl))
+            {
+                throw new ArgumentNullException(nameof(elasticsearchUrl));
+            }
+            else if (string.IsNullOrEmpty(appName))
+            {
+                throw new ArgumentNullException(nameof(appName));
+            }
+
+            Serilog.Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
 #if DEBUG
                 .MinimumLevel.Debug()

@@ -88,7 +88,7 @@ namespace TestSysplan.Core.Infrastructure.Context
 
             if(env != null)
             {
-                builder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                builder.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);                
             }
 
             return UseConfiguration(builder.Build());

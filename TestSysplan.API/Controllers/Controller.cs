@@ -50,6 +50,11 @@ namespace TestSysplan.API.Controllers
         {
             try
             {
+                if(service.Exists(result))
+                {
+                    throw new InvalidOperationException("Already exists a register with this UUID!");
+                }
+
                 return new JsonResult(service.Insert(result));
             }
             catch (Exception ex)
