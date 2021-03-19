@@ -55,7 +55,7 @@ namespace TestSysplan.API.Controllers
                     throw new InvalidOperationException("Already exists a register with this UUID!");
                 }
 
-                return new JsonResult(service.Insert(result));
+                return Ok(service.Insert(result));
             }
             catch (Exception ex)
             {
@@ -79,7 +79,7 @@ namespace TestSysplan.API.Controllers
                     return NoContent();
                 }
 
-                return new JsonResult(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -101,7 +101,7 @@ namespace TestSysplan.API.Controllers
                     return NotFound();
                 }
 
-                return new JsonResult(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -121,7 +121,7 @@ namespace TestSysplan.API.Controllers
                     logger.LogD("Uuid {0} NotFound", args: uuid);
                     return NotFound();
                 }
-                return new JsonResult(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -136,15 +136,7 @@ namespace TestSysplan.API.Controllers
             try
             {
                 var result = service.Paging(page, limit);
-
-                if (result.Count == 0)
-                {
-                    logger.LogD("Page {0} limited to {1} NotFound", 
-                        args: new object[] { page, limit });
-                    return NotFound();
-                }
-
-                return new JsonResult(result);
+                return Ok(result);
             }
             catch (Exception ex)
             {
