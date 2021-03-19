@@ -11,6 +11,8 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Concurrent;
 using TestSysplan.Core.Infrastructure.Context;
+using TestSysplan.Core.Infrastructure.Logger;
+using TestSysplan.Core.Infrastructure.Services;
 
 namespace TestSysplan.API
 {
@@ -48,14 +50,11 @@ namespace TestSysplan.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            new ServiceProviderHelper(services)
-               #region Infra
-               .UseConfiguration(Configuration)
+            services
+               #region Infra               
                .UseLogWithElasticsearch()
-               .UseLocalContextAsSqlServer()
+               .UseLocalContextAsSqlServer("Local")
                .UseServices()
-               .UseConnectionKey("Local")
-               .GetServiceCollection()
                #endregion
                
                #region ApiVersion
