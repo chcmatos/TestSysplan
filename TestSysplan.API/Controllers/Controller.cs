@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Runtime.CompilerServices;
 using TestSysplan.Core.Infrastructure.Logger;
 using TestSysplan.Core.Infrastructure.Services;
 using TestSysplan.Core.Model;
