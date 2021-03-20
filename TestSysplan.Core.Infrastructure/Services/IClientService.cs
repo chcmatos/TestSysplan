@@ -2,5 +2,5 @@
 
 namespace TestSysplan.Core.Infrastructure.Services
 {
-    public interface IClientService : IServiceBase<Client> { }
+    public interface IClientService : IServiceBase<Client>, IServiceBaseAsync<Client> { }
 }

@@ -7,7 +7,7 @@ using TestSysplan.Core.Model;
 
 namespace TestSysplan.Core.Infrastructure.Services
 {
-    internal abstract class ServiceBase<Entity, Context> : IServiceBase<Entity>
+    internal abstract partial class ServiceBase<Entity, Context> : IServiceBase<Entity>
         where Entity : ModelBase, new()
         where Context : ContextBase
     {

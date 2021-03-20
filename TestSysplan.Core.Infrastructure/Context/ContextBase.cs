@@ -82,13 +82,6 @@ namespace TestSysplan.Core.Infrastructure.Context
                 .ContinueWith(r => base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken), cancellationToken)
                 .Unwrap();
         }
-
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.Factory.StartNew(this.OnPrevSaveChanges)
-                .ContinueWith(r => base.SaveChangesAsync(cancellationToken), cancellationToken)
-                .Unwrap();
-        }
         #endregion
 
         protected internal void DetachAllEntities()

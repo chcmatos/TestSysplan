@@ -1,32 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 using TestSysplan.Core.Infrastructure.Logger;
 using TestSysplan.Core.Infrastructure.Services;
 using TestSysplan.Core.Model;
 
 namespace TestSysplan.API.Controllers
 {
-    public abstract class Controller<Model, Service> : ControllerBase<Model, Service>
+    public abstract class ControllerAsync<Model, Service> : ControllerBase<Model, Service>
         where Model : ModelBase
-        where Service : IServiceBase<Model>
+        where Service : IServiceBaseAsync<Model>
     {
-        protected Controller(Service service, ILogger<ControllerBase<Model, Service>> logger) : base(service, logger) { }
+        protected ControllerAsync(Service service, ILogger<ControllerBase<Model, Service>> logger) : base(service, logger) { }
 
-        protected Controller(Service service) : base(service) { }
+        protected ControllerAsync(Service service) : base(service) { }
 
         #region [C]reate
         [HttpPost]
-        public IActionResult Create([FromBody] Model result)
+        public virtual async Task<IActionResult> CreateAsync([FromBody] Model result)
         {
             try
             {
-                if(service.Exists(result))
+                if (await service.ExistsAsync(result))
                 {
                     throw new InvalidOperationException("Already exists a register with this UUID!");
                 }
 
-                return Ok(service.Insert(result));
+                return Ok(await service.InsertAsync(result));
             }
             catch (Exception ex)
             {
@@ -38,11 +40,11 @@ namespace TestSysplan.API.Controllers
 
         #region [R]ead
         [HttpGet]
-        public virtual IActionResult Get()
+        public virtual async Task<IActionResult> GetAsync(CancellationToken cancellationToken)
         {
             try
             {
-                var result = service.List();
+                var result = await service.ListAsync(cancellationToken);
 
                 if (result.Count == 0)
                 {
@@ -58,18 +60,13 @@ namespace TestSysplan.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        
         [HttpGet("{id}")]
-        public virtual IActionResult Get(long id)
+        public virtual async Task<IActionResult> GetAsync(long id)
         {
             try
             {
-                if(id <= 0)
-                {
-                    throw new ArgumentException("Invalid id!");
-                }
-
-                var result = service.Get(id);
+                var result = await service.GetAsync(id);
 
                 if (result == null)
                 {
@@ -87,16 +84,11 @@ namespace TestSysplan.API.Controllers
         }
 
         [HttpGet("uuid/{uuid}")]
-        public virtual IActionResult Get(Guid uuid)
+        public virtual async Task<IActionResult> GetAsync(Guid uuid)
         {
             try
             {
-                if(uuid == default)
-                {
-                    throw new ArgumentException("Invalid uuid!");
-                }
-
-                var result = service.Get(uuid);
+                var result = await service.GetAsync(uuid);
                 if (result == null)
                 {
                     logger.LogD("Uuid {0} NotFound", args: uuid);
@@ -112,16 +104,11 @@ namespace TestSysplan.API.Controllers
         }
 
         [HttpGet("page/{page}/{limit:int?}")]
-        public virtual IActionResult Paging(int page, int limit = -1)
+        public virtual async Task<IActionResult> PagingAsync(int page, int limit = -1, CancellationToken cancellationToken = default)
         {
             try
             {
-                if(page < 0)
-                {
-                    throw new IndexOutOfRangeException("Inválid page!");
-                }
-
-                var result = service.Paging(page, limit);
+                var result = await service.PagingAsync(page, limit, cancellationToken);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -134,13 +121,13 @@ namespace TestSysplan.API.Controllers
 
         #region [U]pdate
         [HttpPut]
-        public IActionResult Update([FromBody] Model result)
+        public async Task<IActionResult> UpdateAsync([FromBody] Model result)
         {
             try
             {
-                if (service.Exists(result))
+                if (await service.ExistsAsync(result))
                 {
-                    service.Update(result);
+                    await service.UpdateAsync(result);
                     return Ok();
                 }
 
@@ -156,20 +143,16 @@ namespace TestSysplan.API.Controllers
 
         #region [D]elete
         [HttpDelete("{uuid}")]
-        public IActionResult Delete(Guid uuid)
+        public async Task<IActionResult> DeleteAsync(Guid uuid)
         {
             try
             {
-                if(uuid == default)
-                {
-                    throw new ArgumentException("Invalid uuid!");
-                }
-                else if (!service.Exists(uuid))
+                if (!await service.ExistsAsync(uuid))
                 {
                     logger.LogD("Uuid {0} NotFound", args: uuid);
                     return NotFound();
                 }
-                else if (service.Delete(uuid))
+                else if (await service.DeleteAsync(uuid))
                 {
                     return Ok();
                 }
