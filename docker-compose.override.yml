@@ -2,15 +2,17 @@ version: '3.7'
 
 services:
   
-  elasticsearch:
+  testsysplan.elasticsearch:
     environment:
       #Enable to monitoring Elasticsearch.
       xpack.monitoring.enabled: "true"
+    volumes:
+      - ./esdata:/usr/share/elasticsearch/data
 
   testsysplan.sqldb:  
-     ports:
+    ports:
       - "1401:1433"
-
+    
   testsysplan.api:  
     environment:  
       - ASPNETCORE_URLS=https://+:443;http://+:80      
@@ -24,3 +26,7 @@ services:
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+volumes:
+  esdata:
+    driver: local  
