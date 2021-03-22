@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
-using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using System;
 using System.Reflection;
@@ -29,27 +29,22 @@ namespace TestSysplan.Core.Infrastructure.Logger
         /// "Elasticsearch": "http://localhost:5151/elasticsearch"
         /// </code>
         /// </summary>
+        /// <param name="services"></param>
         /// <returns></returns>
-        public static IWebHostBuilder UseLogWithElasticsearch(this IWebHostBuilder webBuilder)
+        public static IServiceCollection AddLogWithElasticsearch(this IServiceCollection services, IConfiguration configuration = null)
         {
-            return webBuilder.UseSerilog((context, config) =>
+            if(configuration is null)
             {
-                string elasticsearchUrl = context.Configuration["Elasticsearch:Url"] ?? context.Configuration["Elasticsearch"] ?? ElasticsearchUrl;
-                string appName = context.Configuration["Elasticsearch:Appname"] ?? Assembly.GetEntryAssembly().GetName().Name;
+                var provider  = services.BuildServiceProvider();
+                configuration = provider.GetService<IConfiguration>();
+            }
 
-                config
+            string elasticsearchUrl = ElasticsearchUrl.GetValueOrDefault(configuration["Elasticsearch:Url"] ?? configuration["Elasticsearch"]);
+            string appName = configuration["Elasticsearch:Appname"] ?? Assembly.GetEntryAssembly().GetName().Name;
+
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
                 .Enrich.FromLogContext()
-#if DEBUG
-                .MinimumLevel.Debug()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("System", LogEventLevel.Warning)
-                .WriteTo.Debug()
-                .WriteTo.Console()
-#else
-                .MinimumLevel.Information()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-                .MinimumLevel.Override("System", LogEventLevel.Warning)
-#endif
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticsearchUrl))
                 {
                     AutoRegisterTemplate = true,
@@ -57,8 +52,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
                     IndexFormat = $"{appName}-at-{DateTime.Now:yyyy-MM-dd}",
                     NumberOfReplicas = 1
                 })                
-                .ReadFrom.Configuration(context.Configuration);
-            });
+                .CreateLogger();
+
+            return services;
         }
 
         /// <summary>
@@ -79,9 +75,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
         /// </summary>
         /// <param name="services"></param>
         /// <returns></returns>
-        public static IServiceCollection UseLogWithElasticsearch(this IServiceCollection services)
+        public static ILoggerFactory UseLogWithElasticsearch(this ILoggerFactory loggerFactory)
         {
-            return services.AddLogging(builder => builder.AddSerilog(dispose: true));
+            return loggerFactory.AddSerilog(dispose: true);
         }
     }
 }

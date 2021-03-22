@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using TestSysplan.Core.Infrastructure.Logger;
 
 namespace TestSysplan.API
 {
@@ -13,13 +12,7 @@ namespace TestSysplan.API
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder
-                        .UseLogWithElasticsearch()
-                        .UseStartup<Startup>()
-                        .UseKestrel()
-                        .UseIISIntegration();
-                });
+                .ConfigureWebHostDefaults(webBuilder => webBuilder
+                    .UseStartup<Startup>());
     }
 }

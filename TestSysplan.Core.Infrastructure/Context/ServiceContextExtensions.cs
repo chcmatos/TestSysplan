@@ -7,7 +7,7 @@ namespace TestSysplan.Core.Infrastructure.Context
     public static class ServiceContextExtensions
     {
         #region LocalContext
-        public static IServiceCollection UseLocalContextAsSqlServer(this IServiceCollection services, string configConnectionStringKey = null)
+        public static IServiceCollection AddLocalContextAsSqlServer(this IServiceCollection services, string configConnectionStringKey = null)
         {
             return services.AddDbContext<LocalContext>((prov, options) =>
                 options.UseSqlServer(
@@ -19,7 +19,7 @@ namespace TestSysplan.Core.Infrastructure.Context
                         .Build()));
         }
 
-        public static IServiceCollection UseLocalContextAsPostgres(this IServiceCollection services, string configConnectionStringKey = null)
+        public static IServiceCollection AddLocalContextAsPostgres(this IServiceCollection services, string configConnectionStringKey = null)
         {
             return services
                 .AddEntityFrameworkNpgsql()

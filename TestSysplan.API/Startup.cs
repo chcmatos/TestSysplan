@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -52,9 +54,9 @@ namespace TestSysplan.API
         {
             services
                #region Infra               
-               .UseLogWithElasticsearch()
-               .UseLocalContextAsSqlServer()
-               .UseServices()
+               .AddLogWithElasticsearch()
+               .AddLocalContextAsSqlServer()
+               .AddServices()
                #endregion
                
                #region ApiVersion
@@ -81,12 +83,15 @@ namespace TestSysplan.API
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, 
             IWebHostEnvironment env, 
-            IApiVersionDescriptionProvider provider)
+            IApiVersionDescriptionProvider provider,
+            ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            loggerFactory.UseLogWithElasticsearch();
 
             app.UseApiVersioning()               
                .UseSwagger()

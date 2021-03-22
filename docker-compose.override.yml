@@ -2,14 +2,14 @@ version: '3.7'
 
 services:
   
-  testsysplan.elasticsearch:
+  elasticsearch:
     environment:
       #Enable to monitoring Elasticsearch.
       xpack.monitoring.enabled: "true"
     volumes:
       - ./esdata:/usr/share/elasticsearch/data
 
-  testsysplan.sqldb:  
+  mssqldb:  
     ports:
       - "1401:1433"
     

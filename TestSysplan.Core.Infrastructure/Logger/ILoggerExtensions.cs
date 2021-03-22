@@ -11,6 +11,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
     {
         #region Log base
         private delegate void LogAction(string message, object[] args);
+        private delegate void LogError(Exception error, string message, object[] args);
 
         private static string LogTraceMessage(
             Type loggerType,
@@ -49,6 +50,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
 
         private static void Log(
             LogAction action,
+            LogError errAction,
             Type loggerType,
             Exception error,
             string message,
@@ -57,15 +59,22 @@ namespace TestSysplan.Core.Infrastructure.Logger
             string sourceFile,
             int sourceLine)
         {
-            action.Invoke( 
-                LogTraceMessage(
-                    loggerType,
-                    error,
-                    message,
-                    memberName,
-                    sourceFile,
-                    sourceLine), 
-                args);
+            string trace = LogTraceMessage(
+                       loggerType,
+                       error,
+                       message,
+                       memberName,
+                       sourceFile,
+                       sourceLine);
+
+            if (errAction != null && error != null)
+            {
+                errAction.Invoke(error, trace, args);
+            }
+            else
+            {
+                action.Invoke(trace, args);
+            }
         }
 
         private static void Log(
@@ -78,6 +87,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
             int sourceLine)
         {
             Log(action,
+                null,
                 loggerType,
                 null,
                 message,
@@ -106,7 +116,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
             [CallerLineNumber] int lineNumber = 0,
             params object[] args)
         {
-            Log(logger.LogCritical, logger.GetType(), error, message, args, memberName, filePath, lineNumber);
+            Log(logger.LogCritical,
+                logger.LogCritical,
+                logger.GetType(), error, message, args, memberName, filePath, lineNumber);
         }
         #endregion
 
@@ -128,7 +140,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
             [CallerLineNumber] int lineNumber = 0,
             params object[] args)
         {
-            Log(logger.LogDebug, logger.GetType(), error, message, args, memberName, filePath, lineNumber);
+            Log(logger.LogDebug,
+                logger.LogDebug,
+                logger.GetType(), error, message, args, memberName, filePath, lineNumber);
         }
         #endregion
 
@@ -150,7 +164,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
             [CallerLineNumber] int lineNumber = 0,
             params object[] args)
         {
-            Log(logger.LogError, logger.GetType(), error, message, args, memberName, filePath, lineNumber);
+            Log(logger.LogError, 
+                logger.LogError, 
+                logger.GetType(), error, message, args, memberName, filePath, lineNumber);
         }
         #endregion
 
@@ -183,7 +199,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
             [CallerLineNumber] int lineNumber = 0,
             params object[] args)
         {
-            Log(logger.LogTrace, logger.GetType(), error, message, args, memberName, filePath, lineNumber);
+            Log(logger.LogTrace, 
+                logger.LogTrace, 
+                logger.GetType(), error, message, args, memberName, filePath, lineNumber);
         }
         #endregion
 
@@ -205,7 +223,9 @@ namespace TestSysplan.Core.Infrastructure.Logger
             [CallerLineNumber] int lineNumber = 0,
             params object[] args)
         {
-            Log(logger.LogWarning, logger.GetType(), error, message, args, memberName, filePath, lineNumber);
+            Log(logger.LogWarning,
+                logger.LogWarning,
+                logger.GetType(), error, message, args, memberName, filePath, lineNumber);
         }
         #endregion
     }
