@@ -116,11 +116,6 @@ namespace TestSysplan.API.Controllers
         {
             try
             {
-                if(page < 0)
-                {
-                    throw new IndexOutOfRangeException("Inválid page!");
-                }
-
                 var result = service.Paging(page, limit);
                 return Ok(result);
             }

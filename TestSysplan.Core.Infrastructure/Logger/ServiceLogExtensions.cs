@@ -5,11 +5,14 @@ using Serilog.Events;
 using Serilog.Sinks.Elasticsearch;
 using System;
 using System.Reflection;
+using TestSysplan.Core.Infrastructure.Util;
 
 namespace TestSysplan.Core.Infrastructure.Logger
 {
     public static class ServiceLogExtensions
     {
+        private static readonly EnvironmentVariable ElasticsearchUrl = "ELASTICSEARCH_URL";
+
         /// <summary>
         /// To use log with elasticsearch inputing configuration 
         /// values, create into <i>appsettings.json</i> project 
@@ -31,7 +34,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
         {
             return webBuilder.UseSerilog((context, config) =>
             {
-                string elasticsearchUrl = context.Configuration["Elasticsearch:Url"] ?? context.Configuration["Elasticsearch"];
+                string elasticsearchUrl = context.Configuration["Elasticsearch:Url"] ?? context.Configuration["Elasticsearch"] ?? ElasticsearchUrl;
                 string appName = context.Configuration["Elasticsearch:Appname"] ?? Assembly.GetEntryAssembly().GetName().Name;
 
                 config

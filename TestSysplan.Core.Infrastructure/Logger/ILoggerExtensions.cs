@@ -12,11 +12,6 @@ namespace TestSysplan.Core.Infrastructure.Logger
         #region Log base
         private delegate void LogAction(string message, object[] args);
 
-        private static StringBuilder AppendLineIf(this StringBuilder sb, bool condition, params object[] value)
-        {
-            return condition ? value.Aggregate(sb, (acc, curr) => acc.Append(curr)).AppendLine() : sb;
-        }
-
         private static string LogTraceMessage(
             Type loggerType,
             Exception error,

@@ -53,7 +53,7 @@ namespace TestSysplan.API
             services
                #region Infra               
                .UseLogWithElasticsearch()
-               .UseLocalContextAsSqlServer("Local")
+               .UseLocalContextAsSqlServer()
                .UseServices()
                #endregion
                

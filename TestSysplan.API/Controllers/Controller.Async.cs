@@ -66,6 +66,11 @@ namespace TestSysplan.API.Controllers
         {
             try
             {
+                if (id <= 0)
+                {
+                    throw new ArgumentException("Invalid id!");
+                }
+
                 var result = await service.GetAsync(id);
 
                 if (result == null)
@@ -88,6 +93,11 @@ namespace TestSysplan.API.Controllers
         {
             try
             {
+                if (uuid == default)
+                {
+                    throw new ArgumentException("Invalid uuid!");
+                }
+
                 var result = await service.GetAsync(uuid);
                 if (result == null)
                 {
@@ -147,7 +157,11 @@ namespace TestSysplan.API.Controllers
         {
             try
             {
-                if (!await service.ExistsAsync(uuid))
+                if (uuid == default)
+                {
+                    throw new ArgumentException("Invalid uuid!");
+                }
+                else if (!await service.ExistsAsync(uuid))
                 {
                     logger.LogD("Uuid {0} NotFound", args: uuid);
                     return NotFound();

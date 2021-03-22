@@ -1,0 +1,43 @@
+version: '3.6'
+
+networks:
+  testsysplan-network:
+    driver: bridge
+
+services:
+  testsysplan.api:
+    container_name: testsysplan.api
+    image: ${DOCKER_REGISTRY-}testsysplanapi
+    build:
+      context: .
+      dockerfile: TestSysplan.API/Dockerfile
+    environment:      
+      - DATABASE_LOCAL_NAME=TesteDb
+      - DATABASE_LOCAL_HOST=host.docker.internal
+      - DATABASE_LOCAL_PORT=1401
+      - DATABASE_LOCAL_USER=sa
+      - DATABASE_LOCAL_PSWD=#p@$$w04d
+      - ELASTICSEARCH_URL=http://localhost:9200
+    networks:
+      - testsysplan-network
+    ports:
+      #http
+      - "8080:80"
+      #https
+      - "8081:443"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+    depends_on:
+      - testsysplan.sqldb
+
+  testsysplan.sqldb:  
+    container_name: testsysplan.sqldb
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=#p@$$w04d
+      - ACCEPT_EULA=Y
+    networks:
+      - testsysplan-network
+    ports:
+      - "1401:1433"
