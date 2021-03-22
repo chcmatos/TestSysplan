@@ -1,14 +1,12 @@
 version: '3.7'
 
-networks:
-  testsysplan-network:
-    driver: bridge
-
 services:
 
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    networks:
+      - testsysplan-network
     ports:
       - "9200:9200"
     environment:
@@ -17,14 +15,18 @@ services:
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
     volumes:
       - ./esdata:/usr/share/elasticsearch/data
-      
+
   kibana:
     container_name: kibana
     image: docker.elastic.co/kibana/kibana:7.7.0
+    networks:
+      - testsysplan-network
     ports:
       - "5601:5601"
     depends_on:
       - elasticsearch
+    links:
+      - elasticsearch 
       
   mssqldb:  
     container_name: mssqldb
@@ -51,7 +53,7 @@ services:
       - DATABASE_LOCAL_PORT=1401
       - DATABASE_LOCAL_USER=sa
       - DATABASE_LOCAL_PSWD=#p@$$w04d
-      - ELASTICSEARCH_URL=http://localhost:9200
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
     networks:
       - testsysplan-network
     ports:
@@ -65,6 +67,13 @@ services:
     depends_on:
       - elasticsearch
       - mssqldb
+    links:
+      - elasticsearch
+      - mssqldb
+      
+networks:
+  testsysplan-network:
+    driver: bridge
 
 volumes:
   esdata:
