@@ -1,10 +1,46 @@
-version: '3.6'
+version: '3.7'
 
 networks:
   testsysplan-network:
     driver: bridge
 
 services:
+
+  elasticsearch:
+    container_name: testsysplan.elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      discovery.type: "single-node"
+      ES_JAVA_OPTS: "-Xms2g -Xmx2g"
+    volumes:
+      - ./esdata:/usr/share/elasticsearch/data
+      
+  kibana:
+    container_name: testsysplan.kibana
+    image: docker.elastic.co/kibana/kibana:7.7.0
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+      
+  testsysplan.sqldb:  
+    container_name: testsysplan.sqldb
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      - SA_PASSWORD=#p@$$w04d
+      - MSSQL_SA_PASSWORD=#p@$$w04d
+      - MSSQL_PID=Express
+      - ACCEPT_EULA=Y
+    networks:
+      - testsysplan-network
+    ports:
+      - "1401:1433"
+
   testsysplan.api:
     container_name: testsysplan.api
     image: ${DOCKER_REGISTRY-}testsysplanapi
@@ -13,7 +49,7 @@ services:
       dockerfile: TestSysplan.API/Dockerfile
     environment:      
       - DATABASE_LOCAL_NAME=TesteDb
-      - DATABASE_LOCAL_HOST=host.docker.internal
+      - DATABASE_LOCAL_HOST=localhost
       - DATABASE_LOCAL_PORT=1401
       - DATABASE_LOCAL_USER=sa
       - DATABASE_LOCAL_PSWD=#p@$$w04d
@@ -31,13 +67,6 @@ services:
     depends_on:
       - testsysplan.sqldb
 
-  testsysplan.sqldb:  
-    container_name: testsysplan.sqldb
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    environment:
-      - SA_PASSWORD=#p@$$w04d
-      - ACCEPT_EULA=Y
-    networks:
-      - testsysplan-network
-    ports:
-      - "1401:1433"
+volumes:
+  esdata:
+    driver: local
