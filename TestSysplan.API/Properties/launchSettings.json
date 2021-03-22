@@ -17,13 +17,13 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "DATABASE_LOCAL_NAME": "TestDb",
         "DATABASE_LOCAL_HOST": "localhost",
-        "DATABASE_LOCAL_PORT": "1433",
+        "DATABASE_LOCAL_PORT": "1401",
         "DATABASE_LOCAL_USER": "sa",
-        "DATABASE_LOCAL_PSWD": "123",
+        "DATABASE_LOCAL_PSWD": "#p@$$w04d",
         "ELASTICSEARCH_URL": "http://localhost:9200"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
-    },    
+    },
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
