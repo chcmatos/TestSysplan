@@ -25,4 +25,25 @@
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.4.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Context\Environment\DatabaseConnectionString.Builder.cs">
+      <DependentUpon>Context\Environment\DatabaseConnectionString.cs</DependentUpon>
+    </None>
+    <None Include="Context\Environment\DatabaseConnectionString.Parameters.cs">
+      <DependentUpon>Context\Environment\DatabaseConnectionString.cs</DependentUpon>
+    </None>
+    <None Include="Context\Environment\DatabaseConnectionString.Postgres.cs">
+      <DependentUpon>Context\Environment\DatabaseConnectionString.cs</DependentUpon>
+    </None>
+    <None Include="Context\Environment\DatabaseConnectionString.SqlServer.cs">
+      <DependentUpon>Context\Environment\DatabaseConnectionString.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+    
+  <ItemGroup>
+    <None Include="Services\ServiceBase.Async.cs">
+      <DependentUpon>Services\ServiceBase.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
 </Project>
