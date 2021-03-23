@@ -2,28 +2,30 @@
 using Moq;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace TestSysplan.API.Test
 {
-    public abstract partial class ControllerTest<TModel, TService, TController>        
+    public abstract partial class ControllerTestAsync<TModel, TService, TController>
     {
         #region [U]pdate
         [Fact]
         [Trait("RestApiVerb", "PUT")]
         [Trait("Operation", "Update")]
-        public void UpdateExistentValue()
+        public async void UpdateExistentValue()
         {
             #region  Arrange (Preparar)
-            var item = this.MockValues().Last();            
+            var item = this.MockValues().Last();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Exists(item)).Returns(true);
-            mock.Setup(s => s.Update(item)).Returns(item);
+            mock.Setup(s => s.ExistsAsync(item, CancellationToken.None)).Returns(Task.FromResult(true));
+            mock.Setup(s => s.UpdateAsync(item, CancellationToken.None)).Returns(Task.FromResult(item));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Update(item);
+            var result = await controller.UpdateAsync(item);
             #endregion
 
             #region Assert (Verificar)
@@ -36,39 +38,39 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "PUT")]
         [Trait("Operation", "Update")]
-        public void UpdateExistentValueButReturningAsNotFound()
+        public async void UpdateExistentValueButReturningAsNotFound()
         {
             #region  Arrange (Preparar)
             var item = this.MockValues().First();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Exists(item)).Returns(false);
+            mock.Setup(s => s.ExistsAsync(item, CancellationToken.None)).Returns(Task.FromResult(false));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Update(item);
+            var result = await controller.UpdateAsync(item);
             #endregion
 
             #region Assert (Verificar)
-            Assert.IsType<NotFoundResult>(result);                        
+            Assert.IsType<NotFoundResult>(result);
             #endregion
         }
-        
+
         [Fact]
         [Trait("RestApiVerb", "PUT")]
         [Trait("Operation", "Update")]
         [Trait("Operation", "Error")]
-        public void UpdateExistentValueButReturningAsBadRequest()
+        public async void UpdateExistentValueButReturningAsBadRequest()
         {
             #region  Arrange (Preparar)
-            var ex      = new Exception("Simulated Error!");
-            var mock    = new Mock<TService>();
-            mock.Setup(s => s.Exists(null)).Returns<TModel>((t) => throw ex);
+            var ex = new Exception("Simulated Error!");
+            var mock = new Mock<TService>();
+            mock.Setup(s => s.ExistsAsync(null, CancellationToken.None)).Returns<TModel, CancellationToken>((t, ct) => throw ex);
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Update(null);
+            var result = await controller.UpdateAsync(null);
             #endregion
 
             #region Assert (Verificar)

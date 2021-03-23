@@ -21,7 +21,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="ControllerTest.cs"/>
+    <None Include="ControllerTest.cs">
+      <DependentUpon>ControllerTestBase.cs</DependentUpon>
+    </None>
+    <None Include="ControllerTestAsync.cs">
+      <DependentUpon>ControllerTestBase.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+  
+  <ItemGroup>    
     <None Include="ControllerTest.Create.cs">
       <DependentUpon>ControllerTest.cs</DependentUpon>
     </None>
@@ -35,7 +43,22 @@
       <DependentUpon>ControllerTest.cs</DependentUpon>
     </None>
   </ItemGroup>
-    
+
+  <ItemGroup>
+    <None Include="ControllerTestAsync.Create.cs">
+      <DependentUpon>ControllerTestAsync.cs</DependentUpon>
+    </None>
+    <None Include="ControllerTestAsync.Read.cs">
+      <DependentUpon>ControllerTestAsync.cs</DependentUpon>
+    </None>
+    <None Include="ControllerTestAsync.Update.cs">
+      <DependentUpon>ControllerTestAsync.cs</DependentUpon>
+    </None>
+    <None Include="ControllerTestAsync.Delete.cs">
+      <DependentUpon>ControllerTestAsync.cs</DependentUpon>
+    </None>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\TestSysplan.API\TestSysplan.API.csproj" />
   </ItemGroup>

@@ -2,35 +2,37 @@
 using Moq;
 using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace TestSysplan.API.Test
 {
-    public abstract partial class ControllerTest<TModel, TService, TController>        
+    public abstract partial class ControllerTestAsync<TModel, TService, TController>
     {
         #region [C]reate
         [Fact]
         [Trait("RestApiVerb", "POST")]
         [Trait("Operation", "Insert")]
-        public void InsertANewValue()
+        public async void InsertANewValue()
         {
             #region  Arrange (Preparar)
-            var item  = this.MockValues().First();
-            item.Id   = default;
+            var item = this.MockValues().First();
+            item.Id = default;
             item.Uuid = default;
-            var mock  = new Mock<TService>();
-            mock.Setup(s => s.Exists(item)).Returns(false);
-            mock.Setup(s => s.Insert(item)).Returns<TModel>((t) => 
+            var mock = new Mock<TService>();            
+            mock.Setup(s => s.ExistsAsync(item, default)).Returns(Task.FromResult(false));
+            mock.Setup(s => s.InsertAsync(item, default)).Returns<TModel, CancellationToken>((t, ct) =>
             {
-                t.Id   = new Random().Next();
+                t.Id = new Random().Next();
                 t.Uuid = Guid.NewGuid();
-                return t;
-            });            
+                return Task.FromResult(t);
+            });
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Create(item);
+            var result = await controller.CreateAsync(item);
             #endregion
 
             #region Assert (Verificar)
@@ -41,27 +43,27 @@ namespace TestSysplan.API.Test
             Assert.NotEqual(default, item.Uuid);
             #endregion
         }
-        
+
         [Fact]
         [Trait("RestApiVerb", "POST")]
         [Trait("Operation", "Insert")]
         [Trait("Operation", "Error")]
-        public void InsertANewValueButReturningAsExistingWithBadRequest()
+        public async void InsertANewValueButReturningAsExistingWithBadRequest()
         {
-            #region  Arrange (Preparar)
-            var item = this.MockValues().First();            
+            #region  Arrange (Preparar)            
+            var item = this.MockValues().First();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Exists(item)).Returns(true);            
+            mock.Setup(s => s.ExistsAsync(item, default)).Returns(Task.FromResult(true));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Create(item);
+            var result = await controller.CreateAsync(item);
             #endregion
 
             #region Assert (Verificar)
-            var badRequest  = Assert.IsType<BadRequestObjectResult>(result);
-            string error    = Assert.IsType<string>(badRequest.Value);
+            var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+            string error = Assert.IsType<string>(badRequest.Value);
             Assert.NotEmpty(error);
             Assert.NotEqual(default, item.Id);
             Assert.NotEqual(default, item.Uuid);

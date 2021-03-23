@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using TestSysplan.API.Controllers.V1;
+using TestSysplan.API.Controllers.V2;
 using TestSysplan.Core.Infrastructure.Services;
 using TestSysplan.Core.Model;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace TestSysplan.API.Test.V1
+namespace TestSysplan.API.Test.V2
 {
-    [Trait("APIVersion", "V1")]
+    [Trait("APIVersion", "V2")]
     [Trait("Controller", "Client")]
-    public class ClientControllerTest : ControllerTest<Client, IClientService, ClientController>
+    public class ClientControllerTest : ControllerTestAsync<Client, IClientService, ClientController>
     {
         public ClientControllerTest(ITestOutputHelper output) : base(output) { }
 

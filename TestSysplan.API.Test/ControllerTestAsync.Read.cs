@@ -3,11 +3,13 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace TestSysplan.API.Test
 {
-    public abstract partial class ControllerTest<TModel, TService, TController>        
+    public abstract partial class ControllerTestAsync<TModel, TService, TController>
     {
         #region [R]ead
 
@@ -15,17 +17,17 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetAll")]
-        public void GetAllValues()
+        public async void GetAllValues()
         {
             #region  Arrange (Preparar)
             var list = this.MockValues().ToList();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.List()).Returns(list);
+            mock.Setup(s => s.ListAsync(CancellationToken.None)).Returns(Task.FromResult(list));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get();
+            var result = await controller.GetAsync(CancellationToken.None);
             #endregion
 
             #region Assert (Verificar)
@@ -38,17 +40,17 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetAll")]
-        public void GetAllValuesButReturningAsNoContent()
+        public async void GetAllValuesButReturningAsNoContent()
         {
             #region  Arrange (Preparar)
             var list = new List<TModel>();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.List()).Returns(list);
+            mock.Setup(s => s.ListAsync(CancellationToken.None)).Returns(Task.FromResult(list));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get();
+            var result = await controller.GetAsync(CancellationToken.None);
             #endregion
 
             #region Assert (Verificar)
@@ -60,17 +62,17 @@ namespace TestSysplan.API.Test
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetAll")]
         [Trait("Operation", "Error")]
-        public void GetAllValuesButReturningAsBadRequest()
+        public async void GetAllValuesButReturningAsBadRequest()
         {
             #region  Arrange (Preparar)
             var ex = new Exception("Simulated Error!");
             var mock = new Mock<TService>();
-            mock.Setup(s => s.List()).Returns(() => throw ex);
+            mock.Setup(s => s.ListAsync(CancellationToken.None)).Returns(() => throw ex);
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get();
+            var result = await controller.GetAsync(CancellationToken.None);
             #endregion
 
             #region Assert (Verificar)
@@ -84,17 +86,17 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetById")]
-        public void GetById()
+        public async void GetById()
         {
             #region  Arrange (Preparar)
             var item = this.MockValues().First();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Get(item.Id)).Returns(item);
+            mock.Setup(s => s.GetAsync(item.Id, CancellationToken.None)).Returns(Task.FromResult(item));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get(item.Id);
+            var result = await controller.GetAsync(item.Id);
             #endregion
 
             #region Assert (Verificar)
@@ -107,16 +109,16 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetById")]
-        public void GetByIdButReturningAsNotFound()
+        public async void GetByIdButReturningAsNotFound()
         {
             #region  Arrange (Preparar)            
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Get(long.MaxValue)).Returns(default(TModel));
+            mock.Setup(s => s.GetAsync(long.MaxValue, CancellationToken.None)).Returns(Task.FromResult(default(TModel)));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get(long.MaxValue);
+            var result = await controller.GetAsync(long.MaxValue);
             #endregion
 
             #region Assert (Verificar)
@@ -131,16 +133,16 @@ namespace TestSysplan.API.Test
         [InlineData(long.MinValue)]
         [InlineData(-1L)]
         [InlineData(0L)]
-        public void GetByIdButReturningAsBadRequest(long id)
+        public async void GetByIdButReturningAsBadRequest(long id)
         {
             #region  Arrange (Preparar)            
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Get(id)).Returns(default(TModel));
+            mock.Setup(s => s.GetAsync(id, CancellationToken.None)).Returns(Task.FromResult(default(TModel)));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get(id);
+            var result = await controller.GetAsync(id);
             #endregion
 
             #region Assert (Verificar)
@@ -155,17 +157,17 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetByUuid")]
-        public void GetByUuid()
+        public async void GetByUuid()
         {
             #region  Arrange (Preparar)
             var item = this.MockValues().First();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Get(item.Uuid)).Returns(item);
+            mock.Setup(s => s.GetAsync(item.Uuid, CancellationToken.None)).Returns(Task.FromResult(item));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get(item.Uuid);
+            var result = await controller.GetAsync(item.Uuid);
             #endregion
 
             #region Assert (Verificar)
@@ -178,17 +180,17 @@ namespace TestSysplan.API.Test
         [Fact]
         [Trait("RestApiVerb", "GET")]
         [Trait("Operation", "GetByUuid")]
-        public void GetByUuidButReturningAsNotFound()
+        public async void GetByUuidButReturningAsNotFound()
         {
             #region  Arrange (Preparar)  
             var uuid = Guid.NewGuid();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Get(uuid)).Returns(default(TModel));
+            mock.Setup(s => s.GetAsync(uuid, CancellationToken.None)).Returns(Task.FromResult(default(TModel)));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Get(uuid);
+            var result = await controller.GetAsync(uuid);
             #endregion
 
             #region Assert (Verificar)
@@ -204,17 +206,17 @@ namespace TestSysplan.API.Test
         [InlineData(0, 3)]
         [InlineData(1, 3)]
         [InlineData(3, 3)]
-        public void GetValuesAsPaging(int page, int limit)
+        public async void GetValuesAsPaging(int page, int limit)
         {
             #region  Arrange (Preparar)
             var item = this.MockValues().Skip(page * limit).Take(limit).ToList();
             var mock = new Mock<TService>();
-            mock.Setup(s => s.Paging(page, limit)).Returns(item);
+            mock.Setup(s => s.PagingAsync(page, limit, CancellationToken.None)).Returns(Task.FromResult(item));
             #endregion
 
             #region Act (Agir)
             var controller = GetController(mock);
-            var result = controller.Paging(page, limit);
+            var result = await controller.PagingAsync(page, limit, CancellationToken.None);
             #endregion
 
             #region Assert (Verificar)
@@ -223,7 +225,6 @@ namespace TestSysplan.API.Test
             Assert.Equal(item, value);
             #endregion
         }
-
         #endregion
 
         #endregion
