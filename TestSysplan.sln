@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.Core.Infrastruc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.API", "TestSysplan.API\TestSysplan.API.csproj", "{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSysplan.API.Test", "TestSysplan.API.Test\TestSysplan.API.Test.csproj", "{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}"
+EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F6F79656-05A9-4541-9E6A-A494D788E268}"
 EndProject
 Global
@@ -33,6 +35,10 @@ Global
 		{F6F79656-05A9-4541-9E6A-A494D788E268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

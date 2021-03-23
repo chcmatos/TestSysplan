@@ -32,7 +32,7 @@ namespace TestSysplan.API.Controllers
         protected ControllerBase(Service service, ILogger<ControllerBase<Model, Service>> logger)
         {
             this.service = service ?? throw new ArgumentNullException(nameof(service));
-            this.logger = logger;
+            this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         protected ControllerBase(Service service) : this(service, new EmptyLogger()) { }
