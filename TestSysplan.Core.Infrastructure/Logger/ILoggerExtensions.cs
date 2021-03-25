@@ -10,8 +10,8 @@ namespace TestSysplan.Core.Infrastructure.Logger
     public static class ILoggerExtensions
     {
         #region Log base
-        private delegate void LogAction(string message, object[] args);
-        private delegate void LogError(Exception error, string message, object[] args);
+        internal delegate void LogAction(string message, object[] args);
+        internal delegate void LogError(Exception error, string message, object[] args);
 
         private static string LogTraceMessage(
             Type loggerType,
@@ -48,7 +48,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
                .ToString();
         }
 
-        private static void Log(
+        internal static void Log(
             LogAction action,
             LogError errAction,
             Type loggerType,
@@ -77,7 +77,7 @@ namespace TestSysplan.Core.Infrastructure.Logger
             }
         }
 
-        private static void Log(
+        internal static void Log(
             LogAction action,
             Type loggerType,
             string message,

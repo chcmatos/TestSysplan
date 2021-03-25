@@ -18,6 +18,7 @@ namespace TestSysplan.Core.Infrastructure.Services
         {
             await dbSet.AddAsync(entity ?? throw new ArgumentNullException(nameof(entity)), cancellationToken);
             await dbContext.SaveChangesAsync(cancellationToken);
+            OnInsertedCallback(entity);
             return entity;
         }
         #endregion
@@ -39,7 +40,7 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         public async Task<Entity> GetAsync(long id, CancellationToken cancellationToken)
         {
-            Entity found = await dbSet.FindAsync(id, cancellationToken);
+            Entity found = await dbSet.FindAsync(new object[] { id }, cancellationToken);
             if (found != null) dbContext.Entry(found).State = EntityState.Detached;
             return found;
         }
@@ -135,6 +136,7 @@ namespace TestSysplan.Core.Infrastructure.Services
             }
 
             await dbContext.SaveChangesAsync(cancellationToken);
+            OnUpdatedCallback(entity);
             return entity;
         }
         #endregion
@@ -171,9 +173,16 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         private async Task<int> DeleteLocalAsync(IEnumerable<Guid> uuids, CancellationToken cancellationToken)
         {
-            var entity = await AttachRangeNonExistsAsync(uuids.Select(i => new Entity() { Uuid = i }), cancellationToken);
+            var aux = uuids.Select(i => new Entity() { Uuid = i });
+            var entity = await AttachRangeNonExistsAsync(aux, cancellationToken);
             dbSet.RemoveRange(entity);
-            return Math.Min(await dbContext.SaveChangesAsync(cancellationToken), entity.Count);
+            return await dbContext.SaveChangesAsync(cancellationToken)                
+                .ContinueWith(t =>
+                {
+                    int res = Math.Min(t.Result, entity.Count);
+                    if (res > 0) OnDeletedCallback(aux);
+                    return res;
+                }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
 
         public Task<int> DeleteAsync(IEnumerable<Guid> uuids, CancellationToken cancellationToken)
@@ -199,13 +208,17 @@ namespace TestSysplan.Core.Infrastructure.Services
         public async Task<bool> DeleteAsync(IEnumerable<Entity> entity, CancellationToken cancellationToken)
         {
             dbSet.RemoveRange(await AttachRangeNonExistsAsync(entity, cancellationToken));
-            return await dbContext.SaveChangesAsync(cancellationToken) >= entity.Count();
+            var res = await dbContext.SaveChangesAsync(cancellationToken) >= entity.Count();
+            if (res) OnDeletedCallback(entity);
+            return res;
         }
 
         public async Task<bool> DeleteAsync(Entity[] entity, CancellationToken cancellationToken)
         {
             dbSet.RemoveRange(await AttachRangeNonExistsAsync(entity, cancellationToken));
-            return await dbContext.SaveChangesAsync(cancellationToken) >= entity.Length;
+            var res = await dbContext.SaveChangesAsync(cancellationToken) >= entity.Length;
+            if (res) OnDeletedCallback(entity);
+            return res;
         }
 
         public Task<bool> DeleteAsync(params Entity[] entity)

@@ -14,7 +14,7 @@ services:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
     volumes:
-      - ./esdata:/usr/share/elasticsearch/data
+      - ./dockervol/elasticsearch/esdata:/usr/share/elasticsearch/data
 
   kibana:
     container_name: kibana
@@ -27,13 +27,33 @@ services:
       - elasticsearch
     links:
       - elasticsearch 
-      
+    
+  rabbitmq:
+    image: rabbitmq:3.6-management-alpine
+    container_name: rabbitmq
+    volumes:     
+      - ./dockervol/rabbitmq/data:/var/lib/rabbitmq
+      - ./dockervol/rabbitmq/log:/var/log/rabbitmq
+    ports: 
+      # The standard AMQP protocol port
+      - 5672:5672
+      # Http management UI port
+      - 15672:15672
+    networks: 
+      - testsysplan-network
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=MYS3C43TK3YF045Y5PL4N
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=bn8fLJFD4jjKLShr
+      - RABBITMQ_DEFAULT_VHOST=/
+      #- CLUSTERED=true
+
   mssqldb:  
     container_name: mssqldb
     image: mcr.microsoft.com/mssql/server:latest
     environment:
-      - SA_PASSWORD=#p@$$w04d
-      - MSSQL_SA_PASSWORD=#p@$$w04d
+      - SA_PASSWORD=RZ_Y#P@UBbjE2q2!
+      - MSSQL_SA_PASSWORD=RZ_Y#P@UBbjE2q2!
       - MSSQL_PID=Express
       - ACCEPT_EULA=Y
     networks:
@@ -52,7 +72,13 @@ services:
       - DATABASE_LOCAL_HOST=localhost
       - DATABASE_LOCAL_PORT=1401
       - DATABASE_LOCAL_USER=sa
-      - DATABASE_LOCAL_PSWD=#p@$$w04d
+      - DATABASE_LOCAL_PSWD=RZ_Y#P@UBbjE2q2!
+      - AMQP_USER=root
+      - AMQP_PASS=bn8fLJFD4jjKLShr
+      - AMQP_HOST=rabbitmq
+      - AMQP_VHOST=/
+      - AMQP_PORT=5672
+      - AMQP_SSL=none
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     networks:
       - testsysplan-network
@@ -76,5 +102,5 @@ networks:
     driver: bridge
 
 volumes:
-  esdata:
+  dockervol:
     driver: local  

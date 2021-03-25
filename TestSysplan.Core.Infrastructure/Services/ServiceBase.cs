@@ -26,7 +26,8 @@ namespace TestSysplan.Core.Infrastructure.Services
         public Entity Insert(Entity entity)
         {
             dbSet.Add(entity ?? throw new ArgumentNullException(nameof(entity)));
-            dbContext.SaveChanges();            
+            dbContext.SaveChanges();
+            OnInsertedCallback(entity);
             return entity;
         }
         #endregion
@@ -142,6 +143,7 @@ namespace TestSysplan.Core.Infrastructure.Services
             }
 
             dbContext.SaveChanges();
+            OnUpdatedCallback(entity);
             return entity;
         }
         #endregion
@@ -174,9 +176,12 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         private int DeleteLocal(IEnumerable<Guid> uuids)
         {
-            var entity = AttachRangeNonExists(uuids.Select(i => new Entity() { Uuid = i })).ToList();
+            var aux     = uuids.Select(i => new Entity() { Uuid = i });
+            var entity  = AttachRangeNonExists(aux).ToList();
             dbSet.RemoveRange(entity);
-            return Math.Min(dbContext.SaveChanges(), entity.Count);
+            int count = dbContext.SaveChanges();
+            if(count > 0) OnDeletedCallback(aux);
+            return Math.Min(count, entity.Count);
         }
 
         public int Delete(IEnumerable<Guid> uuids)
@@ -197,14 +202,26 @@ namespace TestSysplan.Core.Infrastructure.Services
         public bool Delete(IEnumerable<Entity> entity)
         {
             dbSet.RemoveRange(AttachRangeNonExists(entity));
-            return dbContext.SaveChanges() >= entity.Count();
+            var res = dbContext.SaveChanges() >= entity.Count();
+            if (res) OnDeletedCallback(entity);
+            return res;
         }
 
         public bool Delete(params Entity[] entity)
         {
             dbSet.RemoveRange(AttachRangeNonExists(entity));
-            return dbContext.SaveChanges() >= entity.Length;
+            var res = dbContext.SaveChanges() >= entity.Length;
+            if (res) OnDeletedCallback(entity);
+            return res;
         }
+        #endregion
+
+        #region Callbacks
+        protected virtual void OnInsertedCallback(Entity entity) { }
+
+        protected virtual void OnUpdatedCallback(Entity entity) { }
+        
+        protected virtual void OnDeletedCallback(IEnumerable<Entity> entities) { }
         #endregion
 
     }
