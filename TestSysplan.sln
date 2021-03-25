@@ -9,9 +9,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.Core.Infrastruc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.API", "TestSysplan.API\TestSysplan.API.csproj", "{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSysplan.API.Test", "TestSysplan.API.Test\TestSysplan.API.Test.csproj", "{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.API.Test", "TestSysplan.API.Test\TestSysplan.API.Test.csproj", "{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{F6F79656-05A9-4541-9E6A-A494D788E268}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSysplan.Worker.Service.WelcomeClient", "TestSysplan.Worker.Service.WelcomeClient\TestSysplan.Worker.Service.WelcomeClient.csproj", "{739B203E-9E46-4BFF-8D1E-1EEF7CC8AF31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestSysplan.Worker.Service.FarewellClient", "TestSysplan.Worker.Service.FarewellClient\TestSysplan.Worker.Service.FarewellClient.csproj", "{A1578521-4701-4503-AA5B-FA5AD6CD4B3A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +35,22 @@ Global
 		{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1E3605D-CE53-48CF-B3A9-6FD6D1E17F60}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F6F79656-05A9-4541-9E6A-A494D788E268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F6F79656-05A9-4541-9E6A-A494D788E268}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD70B8B7-7418-4ECB-9701-D545D35EC0B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6F79656-05A9-4541-9E6A-A494D788E268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6F79656-05A9-4541-9E6A-A494D788E268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6F79656-05A9-4541-9E6A-A494D788E268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{739B203E-9E46-4BFF-8D1E-1EEF7CC8AF31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{739B203E-9E46-4BFF-8D1E-1EEF7CC8AF31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{739B203E-9E46-4BFF-8D1E-1EEF7CC8AF31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{739B203E-9E46-4BFF-8D1E-1EEF7CC8AF31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1578521-4701-4503-AA5B-FA5AD6CD4B3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1578521-4701-4503-AA5B-FA5AD6CD4B3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1578521-4701-4503-AA5B-FA5AD6CD4B3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1578521-4701-4503-AA5B-FA5AD6CD4B3A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -180,7 +180,7 @@ namespace TestSysplan.Core.Infrastructure.Services
             var entity  = AttachRangeNonExists(aux).ToList();
             dbSet.RemoveRange(entity);
             int count = dbContext.SaveChanges();
-            if(count > 0) OnDeletedCallback(aux);
+            if(count > 0) OnDeletedCallback(entity);
             return Math.Min(count, entity.Count);
         }
 
@@ -201,17 +201,19 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         public bool Delete(IEnumerable<Entity> entity)
         {
-            dbSet.RemoveRange(AttachRangeNonExists(entity));
+            var att = AttachRangeNonExists(entity);
+            dbSet.RemoveRange(att);
             var res = dbContext.SaveChanges() >= entity.Count();
-            if (res) OnDeletedCallback(entity);
+            if (res) OnDeletedCallback(att);
             return res;
         }
 
         public bool Delete(params Entity[] entity)
         {
-            dbSet.RemoveRange(AttachRangeNonExists(entity));
+            var att = AttachRangeNonExists(entity);
+            dbSet.RemoveRange(att);
             var res = dbContext.SaveChanges() >= entity.Length;
-            if (res) OnDeletedCallback(entity);
+            if (res) OnDeletedCallback(att);
             return res;
         }
         #endregion

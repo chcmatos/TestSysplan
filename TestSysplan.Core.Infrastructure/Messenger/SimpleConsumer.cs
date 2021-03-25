@@ -2,24 +2,30 @@
 using RabbitMQ.Client.Events;
 using Serilog;
 using System;
-using System.Linq;
 using System.Collections.Concurrent;
+using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
-using TestSysplan.Core.Infrastructure.Logger;
 using System.Threading.Tasks;
+using TestSysplan.Core.Infrastructure.Logger;
 
 namespace TestSysplan.Core.Infrastructure.Messenger
 {
-    public sealed class SimpleConsumer
+    internal sealed class SimpleConsumer
     {
         private static readonly SimpleConsumer instance;
 
         private readonly ConcurrentDictionary<string, ManualResetEvent> resetEvents; 
-        
+
         public static SimpleConsumer GetInstance()
         {
             return instance;
+        }
+
+        static SimpleConsumer()
+        {
+            instance = new SimpleConsumer();
         }
 
         private SimpleConsumer() 
@@ -59,7 +65,11 @@ namespace TestSysplan.Core.Infrastructure.Messenger
         /// </param>
         /// <param name="balanceCount">
         /// caso maior que 0 (zero), o message broker vai entregar por requisição do consumer
-        /// apenas o numero de mensagens definido. Viavel para balanceamento de carga.
+        /// apenas o numero de mensagens definido.
+        /// Caso menor ou igual a 0 (zero), será verificado se existe a variavel de ambiente
+        /// AMQP_DBC, caso exista com um valor numérico maior que zero, será considerado
+        /// com a regra descrita acima, caso constrário, não habilita Qos Prefetch.
+        /// Viavel para balanceamento de carga.
         /// </param>
         /// <param name="logger">
         /// log que armazenará mensagens de erro gerada.
@@ -98,67 +108,76 @@ namespace TestSysplan.Core.Infrastructure.Messenger
                 return false;//another process did it.
             }
 
-            using (var conn = AmqpConnectionWrapper.GetInstance())
-            using (var channel = conn.CreateModel())
+            try
             {
-                if (balanceCount > 0)
+                using (var conn = AmqpConnectionWrapper.GetInstance())
+                using (var channel = conn.CreateModel())
                 {
-                    channel.BasicQos(0u, balanceCount, false /*per consumer*/);
-                }
-
-                channel.QueueDeclare(
-                    queue: queueName,
-                    durable: false,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: null);
-
-                var consumer = new EventingBasicConsumer(channel);
-                
-                void received(object ch, BasicDeliverEventArgs args)
-                {
-                    try
+                    if (balanceCount > 0 ||
+                        (balanceCount = ConnectionEnvironment.AMQP_DBC.ToUInt16()) > 0)
                     {
-                        var body = args.Body.Span;
-                        TModel model = JsonSerializer.Deserialize<TModel>(body);
-                        onConsumedCallback.Invoke(model);
-                        if (!autoAck) channel.BasicAck(args.DeliveryTag, false);
+                        channel.BasicQos(0u, balanceCount, false /*per consumer*/);
                     }
-                    catch (Exception ex)
+
+                    channel.QueueDeclare(
+                        queue: queueName,
+                        durable: false,
+                        exclusive: false,
+                        autoDelete: false,
+                        arguments: null);
+
+                    var consumer = new EventingBasicConsumer(channel);
+
+                    void received(object ch, BasicDeliverEventArgs args)
                     {
-                        if (!autoAck) channel.BasicNack(args.DeliveryTag, false, requeue);
-                        logger?.LogE(ex);
-                        if (throwsException) error = ex;
-                        resetEvent.Dispose();
+                        try
+                        {
+                            var body = args.Body.Span;
+                            TModel model = JsonSerializer.Deserialize<TModel>(body);
+                            onConsumedCallback.Invoke(model);
+                            if (!autoAck && channel.IsOpen) channel.BasicAck(args.DeliveryTag, false);
+                        }
+                        catch (Exception ex)
+                        {
+                            if (!autoAck && channel.IsOpen) channel.BasicNack(args.DeliveryTag, false, requeue);
+                            logger?.LogE(ex);
+                            if (throwsException) error = ex;
+                            resetEvent.Set();
+                        }
                     }
-                }
 
-                void shutdown(object ch, ShutdownEventArgs args)
-                {
-                    consumer.Received -= received;
-                    consumer.Shutdown -= shutdown;
-                    try
+                    void shutdown(object ch, ShutdownEventArgs args)
                     {
-                        resetEvent.Set();
+                        consumer.Received -= received;
+                        consumer.Shutdown -= shutdown;
+                        try
+                        {
+                            resetEvent.Set();
+                        }
+                        catch (ObjectDisposedException) { /*disposed*/ }
+                    };
+
+                    consumer.Received += received;
+                    consumer.Shutdown += shutdown;
+
+                    channel.BasicConsume(
+                        queue: queueName,
+                        autoAck: autoAck,
+                        consumer: consumer);
+
+                    bool result = resetEvent.WaitOne();
+                    if (result && throwsException && error != null)
+                    {
+                        throw new AggregateException(error);
                     }
-                    catch (ObjectDisposedException) { /*disposed*/ }
-                };
 
-                consumer.Received += received;
-                consumer.Shutdown += shutdown;
-
-                channel.BasicConsume(
-                    queue: queueName,
-                    autoAck: autoAck,
-                    consumer: consumer);
-
-                bool result = resetEvent.WaitOne();
-                if(result && throwsException && error != null)
-                {
-                    throw new AggregateException(error);
+                    return !result;
                 }
-
-                return result;
+            }
+            catch (Exception)
+            {
+                Unregister<TModel>(queueName);
+                throw;
             }
         }
 
@@ -189,7 +208,11 @@ namespace TestSysplan.Core.Infrastructure.Messenger
         /// </param>
         /// <param name="balanceCount">
         /// caso maior que 0 (zero), o message broker vai entregar por requisição do consumer
-        /// apenas o numero de mensagens definido. Viavel para balanceamento de carga.
+        /// apenas o numero de mensagens definido.
+        /// Caso menor ou igual a 0 (zero), será verificado se existe a variavel de ambiente
+        /// AMQP_DBC, caso exista com um valor numérico maior que zero, será considerado
+        /// com a regra descrita acima, caso constrário, não habilita Qos Prefetch.
+        /// Viavel para balanceamento de carga.
         /// </param>
         /// <param name="logger">
         /// log que armazenará mensagens de erro gerada.
@@ -226,14 +249,12 @@ namespace TestSysplan.Core.Infrastructure.Messenger
         /// </summary>
         /// <typeparam name="TModel">tipo do objeto alvo</typeparam>
         /// <param name="queueName">fila alvo</param>
-        public void Unregister<TModel>(string queueName = null)
+        public bool Unregister<TModel>(string queueName = null)
         {
             var hash = GetResetEventHash<TModel>(queueName);
-            if(resetEvents.TryRemove(hash, out var resetEvent))
-            {
-                resetEvent.Set();
-                resetEvent.Dispose();
-            }
+            bool result = resetEvents.TryRemove(hash, out var resetEvent);
+            if(result) resetEvent.Dispose();
+            return result;
         }
 
         /// <summary>
@@ -248,7 +269,6 @@ namespace TestSysplan.Core.Infrastructure.Messenger
                 {
                     if (resetEvents.TryRemove(hash, out var re))
                     {
-                        re.Set();
                         re.Dispose();
                     }
                 });

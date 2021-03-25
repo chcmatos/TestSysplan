@@ -95,7 +95,7 @@ namespace TestSysplan.Core.Infrastructure.Util
         public string GetValueOrDefault(object defaultValue)
         {
             string aux = Value;
-            return string.IsNullOrWhiteSpace(aux) ? defaultValue.ToString() : aux;
+            return string.IsNullOrWhiteSpace(aux) ? defaultValue?.ToString() ?? "" : aux;
         }
 
         /// <summary>

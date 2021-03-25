@@ -47,7 +47,7 @@ services:
       - RABBITMQ_DEFAULT_PASS=bn8fLJFD4jjKLShr
       - RABBITMQ_DEFAULT_VHOST=/
       #- CLUSTERED=true
-
+          
   mssqldb:  
     container_name: mssqldb
     image: mcr.microsoft.com/mssql/server:latest
@@ -79,6 +79,7 @@ services:
       - AMQP_VHOST=/
       - AMQP_PORT=5672
       - AMQP_SSL=none
+      - AMQP_DBC=0
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     networks:
       - testsysplan-network
@@ -96,7 +97,57 @@ services:
     links:
       - elasticsearch
       - mssqldb
-      
+  
+  testsysplan.service.wc:
+    container_name: testsysplan.service.wc
+    image: ${DOCKER_REGISTRY-}testsysplan.service.wc
+    build:
+      context: .
+      dockerfile: TestSysplan.Worker.Service.WelcomeClient/Dockerfile
+    environment:      
+      - AMQP_USER=root
+      - AMQP_PASS=bn8fLJFD4jjKLShr
+      - AMQP_HOST=rabbitmq
+      - AMQP_VHOST=/
+      - AMQP_PORT=5672
+      - AMQP_SSL=none
+      - AMQP_DBC=0
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    restart: on-failure
+    networks:
+      - testsysplan-network
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    links:
+      - elasticsearch
+      - rabbitmq
+          
+  testsysplan.service.fc:
+    container_name: testsysplan.service.fc
+    image: ${DOCKER_REGISTRY-}testsysplan.service.fc
+    build:
+      context: .
+      dockerfile: TestSysplan.Worker.Service.FarewellClient/Dockerfile
+    environment:      
+      - AMQP_USER=root
+      - AMQP_PASS=bn8fLJFD4jjKLShr
+      - AMQP_HOST=rabbitmq
+      - AMQP_VHOST=/
+      - AMQP_PORT=5672
+      - AMQP_SSL=none
+      - AMQP_DBC=0
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    restart: on-failure
+    networks:
+      - testsysplan-network
+    depends_on:
+      - elasticsearch
+      - rabbitmq
+    links:
+      - elasticsearch
+      - rabbitmq
+          
 networks:
   testsysplan-network:
     driver: bridge

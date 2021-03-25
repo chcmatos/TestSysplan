@@ -20,6 +20,13 @@
         "DATABASE_LOCAL_PORT": "1401",
         "DATABASE_LOCAL_USER": "sa",
         "DATABASE_LOCAL_PSWD": "#p@$$w04d",
+        "AMQP_USER": "root",
+        "AMQP_PASS": "bn8fLJFD4jjKLShr",
+        "AMQP_HOST": "rabbitmq",
+        "AMQP_VHOST": "/",
+        "AMQP_PORT": "5672",
+        "AMQP_SSL": "none",
+        "AMQP_DBC": "0",
         "ELASTICSEARCH_URL": "http://localhost:9200"
       },
       "applicationUrl": "https://localhost:5001;http://localhost:5000"

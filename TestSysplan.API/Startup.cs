@@ -7,13 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
 using System.Collections.Concurrent;
 using TestSysplan.Core.Infrastructure.Context;
 using TestSysplan.Core.Infrastructure.Logger;
+using TestSysplan.Core.Infrastructure.Messenger.Services;
 using TestSysplan.Core.Infrastructure.Services;
 
 namespace TestSysplan.API
@@ -54,9 +54,10 @@ namespace TestSysplan.API
         {
             services
                #region Infra               
-               .AddLogWithElasticsearch()
                .AddLocalContextAsSqlServer()
-               .AddServices()
+               .AddLogServiceWithElasticsearch()
+               .AddClientService()
+               .AddAmqpService()
                #endregion
                
                #region ApiVersion
@@ -91,7 +92,7 @@ namespace TestSysplan.API
                 app.UseDeveloperExceptionPage();
             }
 
-            loggerFactory.UseLogWithElasticsearch();
+            loggerFactory.UseLogServiceWithElasticsearch();
 
             app.UseApiVersioning()               
                .UseSwagger()

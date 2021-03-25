@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using TestSysplan.Core.Model;
 
-namespace TestSysplan.Core.Infrastructure.Services
+namespace TestSysplan.Core.Infrastructure.Messenger.Services
 {
-    public interface IMessageService
+    public interface IPublishMessageService
     {
         void Publish<TModel>(TModel model, string rountingKey = null) where TModel : ModelBase;
 

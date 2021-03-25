@@ -48,8 +48,8 @@ namespace TestSysplan.Core.Infrastructure.Messenger
                 if (Interlocked.Read(ref count) > 0L &&
                     Interlocked.Decrement(ref count) == 0L)
                 {
-                    current.Close();
-                    current.Dispose();
+                    current?.Close();
+                    current?.Dispose();
                 }
             }
         }

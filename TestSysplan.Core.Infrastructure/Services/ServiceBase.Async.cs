@@ -180,7 +180,7 @@ namespace TestSysplan.Core.Infrastructure.Services
                 .ContinueWith(t =>
                 {
                     int res = Math.Min(t.Result, entity.Count);
-                    if (res > 0) OnDeletedCallback(aux);
+                    if (res > 0) OnDeletedCallback(entity);
                     return res;
                 }, TaskContinuationOptions.OnlyOnRanToCompletion);
         }
@@ -207,17 +207,19 @@ namespace TestSysplan.Core.Infrastructure.Services
 
         public async Task<bool> DeleteAsync(IEnumerable<Entity> entity, CancellationToken cancellationToken)
         {
-            dbSet.RemoveRange(await AttachRangeNonExistsAsync(entity, cancellationToken));
+            var att = await AttachRangeNonExistsAsync(entity, cancellationToken);
+            dbSet.RemoveRange(att);
             var res = await dbContext.SaveChangesAsync(cancellationToken) >= entity.Count();
-            if (res) OnDeletedCallback(entity);
+            if (res) OnDeletedCallback(att);
             return res;
         }
 
         public async Task<bool> DeleteAsync(Entity[] entity, CancellationToken cancellationToken)
         {
-            dbSet.RemoveRange(await AttachRangeNonExistsAsync(entity, cancellationToken));
+            var att = await AttachRangeNonExistsAsync(entity, cancellationToken);
+            dbSet.RemoveRange(att);
             var res = await dbContext.SaveChangesAsync(cancellationToken) >= entity.Length;
-            if (res) OnDeletedCallback(entity);
+            if (res) OnDeletedCallback(att);
             return res;
         }
 

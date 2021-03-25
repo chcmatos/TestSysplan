@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Serilog;
 
 namespace TestSysplan.Core.Infrastructure.Services
 {
@@ -8,9 +7,13 @@ namespace TestSysplan.Core.Infrastructure.Services
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             return services
-                .AddSingleton<ILogger>(prov => Serilog.Log.Logger)
-                .AddScoped<IClientService, ClientService>()
-                .AddScoped<IMessageService, AMQPService>();
+                .AddClientService();
+        }
+
+        public static IServiceCollection AddClientService(this IServiceCollection services)
+        {
+            return services
+                .AddScoped<IClientService, ClientService>();
         }
 
     }

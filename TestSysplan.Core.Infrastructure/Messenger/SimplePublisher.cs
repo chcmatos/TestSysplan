@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace TestSysplan.Core.Infrastructure.Messenger
 {
-    public sealed class SimplePublisher
+    internal sealed class SimplePublisher
     {
         private static readonly SimplePublisher instance;
 
@@ -46,7 +46,13 @@ namespace TestSysplan.Core.Infrastructure.Messenger
                     autoDelete: false,
                     arguments: null);
 
-                byte[] json = JsonSerializer.SerializeToUtf8Bytes(target);
+                byte[] json = JsonSerializer.SerializeToUtf8Bytes(target,
+                    new JsonSerializerOptions
+                    {
+                        IgnoreReadOnlyFields = true,
+                        IgnoreReadOnlyProperties = true,
+                        IgnoreNullValues = true
+                    });
 
                 channel.BasicPublish(
                     exchange: exchange,
