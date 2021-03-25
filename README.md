@@ -1,32 +1,43 @@
 # Test Sysplan
-A simple example of usage ASP.NET Core Web API
 
-## Test
-O teste tem como objetivo avaliar os conhecimentos do candidato
-nos seguintes itens:
-- Conhecimento técnico nas tecnologias .NET Core, Web API e SQL
-Server
-- Padronização e organização do código;
-- Acesso e manipulação de informações em banco de dados SQL
-Server (usar ORM
-de sua preferência);
-Considerações :
-- O objetivo é avaliar as competências técnicas descritas no início do
-documento;
-- Não existe certo ou errado, faça a arquitetura que julga melhor;
-- O projeto deve conter apenas uma entidade de Cliente;
-- Criar 4 rotas para manutenção dos dados: GET, POST, PUT e
-DELETE;
-- Tratar os possíveis erros de cada rota;
-O banco de dados SQL utilizado para a avaliação pode ser criado e
-acessado mediante as
-configurações:
-- Para criação do banco utilizar Code-First;
-- Criar uma tabela de chamada Cliente via Code-First com as colunas
-abaixo :
-- Id - Guid
-- Nome - nvarchar(100)
-- Idade - int
-- Habilitar o migrations para que possamos criar o banco e tabelas;
-- Nome do servidor : Local
-- O nome do banco, usuário e senha ficam ao seu critério;
+O teste apresentado tem como objetivo avaliar os seguintes itens:
+
+- SOLID
+- TDD (Test-Driven Development)
+- Clean Architecture
+- Hexagonal Architecure (Portas e Protocolos)
+- .NET Core 3.1;
+- Web REST API;
+- API Versioning;
+- Swagger
+- MSSQL Server
+- Serilog para logging
+- ELK - Elastic Stack (logstach, Elasticsearch e Kibana)
+- GIT
+- Docker
+- AMQP (RabitMQ)
+
+## Descrição
+
+A solução apresentada corresponde a uma API e dois microsserviços.
+Cada microsserviço apresentado consome uma fila específica.
+
+A API possui os metodos de CRUD para cada controller correspondente 
+a uma entidade. No caso encontrará apenas Client.
+
+A arquitetura adotada para este teste foi a arquitetura limpa, ou clean architecture.
+
+![image](https://user-images.githubusercontent.com/10169901/112555945-f25a6f80-8da7-11eb-8a5e-60e97b3a8d15.png)
+[Figura1 -  Diagrama Arquitetura Limpa]
+
+Como pode ser observado na imagem acima (Figura1), a arquitetura limpa nos leva diretamente ao
+uso de boas práticas como DDD e SOLID, visto que abstraímos o problema proposto, olhando primeiramente
+para o negócio, entender as regras de negócio, para compreender o problema; Delimitar o contexto
+de negócio que estamos tratando, e a partir desse ponto, desenhar um mapa de contexto, a interação
+entre as entidades encontradas. 
+
+A não aplicação do DDD e SOLID, sendo SOLID toda a base de boas práticas para boas aplicações,
+levará inevitavelmente ao fracasso de um projeto no momento que este precisar escalar.
+
+
+
