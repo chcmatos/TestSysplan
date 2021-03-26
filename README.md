@@ -44,7 +44,7 @@ levará inevitavelmente ao fracasso de um projeto no momento que este precisar e
  [Figura2 -  Diagrama Arquitetura Hexagonal]
 
 Sobre o uso da arquitetura hexagonal (Figura2), a sua escolha determina que a solução proposta é de
-projetos desacoplados. A comunicação entre eles deve ser por meio de portas e adaptadores.
+projetos desacoplados. A comunicação entre eles devem ser por meio de portas e adaptadores.
 
 No nosso exemplo não temos um projeto Aplicação, foi proposto apenas uma API e os microsserviços.
 Entretando, caso quisessemos incluir uma UI/UX esta seria a nossa aplicação, e a mesma comunicariasse
