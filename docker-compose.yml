@@ -111,7 +111,7 @@ services:
       - AMQP_VHOST=/
       - AMQP_PORT=5672
       - AMQP_SSL=none
-      - AMQP_DBC=0
+      - AMQP_DBC=10
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     restart: on-failure
     networks:
@@ -136,7 +136,7 @@ services:
       - AMQP_VHOST=/
       - AMQP_PORT=5672
       - AMQP_SSL=none
-      - AMQP_DBC=0
+      - AMQP_DBC=10
       - ELASTICSEARCH_URL=http://elasticsearch:9200
     restart: on-failure
     networks:
