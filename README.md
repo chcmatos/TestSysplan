@@ -5,7 +5,7 @@ O teste apresentado tem como objetivo avaliar os seguintes itens:
 - SOLID
 - TDD (Test-Driven Development)
 - Clean Architecture
-- Hexagonal Architecure (Portas e Protocolos)
+- Hexagonal Architecure (Portas e Adaptadores)
 - Design Patterns (GoF)
 - .NET Core 3.1;
 - Web REST API;
