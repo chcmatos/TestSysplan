@@ -96,7 +96,7 @@ namespace TestSysplan.Core.Infrastructure.Messenger.Services
 
         public bool UnregisterConsume<TModel>(string rountingKey)
         {
-            return SimpleConsumer.GetInstance().Unregister<TModel>(rountingKey);
+            return SimpleConsumer.GetInstance().Unregister(rountingKey);
         }
 
         public void UnregisterAll()
