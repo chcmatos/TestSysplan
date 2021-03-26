@@ -6,6 +6,7 @@ O teste apresentado tem como objetivo avaliar os seguintes itens:
 - TDD (Test-Driven Development)
 - Clean Architecture
 - Hexagonal Architecure (Portas e Protocolos)
+- Design Patterns (GoF)
 - .NET Core 3.1;
 - Web REST API;
 - API Versioning;
