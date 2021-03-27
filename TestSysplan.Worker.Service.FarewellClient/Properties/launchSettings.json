@@ -5,14 +5,17 @@
       "environmentVariables": {
         "AMQP_VHOST": "/",
         "AMQP_SSL": "none",
+        "ELASTICSEARCH_URL": "http://localhost:9200",
         "AMQP_USER": "root",
         "AMQP_PORT": "5672",
         "DOTNET_ENVIRONMENT": "Development",
         "AMQP_PASS": "bn8fLJFD4jjKLShr",
         "AMQP_DBC": "10",
-        "AMQP_HOST": "localhost",
-        "ELASTICSEARCH_URL": "http://localhost:9200"
+        "AMQP_HOST": "localhost"
       }
+    },
+    "Docker": {
+      "commandName": "Docker"
     }
   }
 }
