@@ -6,10 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
-using System;
 using System.Collections.Concurrent;
 using TestSysplan.Core.Infrastructure.Context;
 using TestSysplan.Core.Infrastructure.Logger;
@@ -34,18 +32,8 @@ namespace TestSysplan.API
         {
             while (versions.TryTake(out string v))
             {
-                options.SwaggerDoc(v, new OpenApiInfo
-                {
-                    Version = v,
-                    Title = Configuration["SwaggerDoc:Title"],
-                    Description = Configuration["SwaggerDoc:Description"],
-                    Contact = new OpenApiContact
-                    {
-                        Name = Configuration["SwaggerDoc:Author:Name"],
-                        Email = Configuration["SwaggerDoc:Author:Email"],
-                        Url = new Uri(Configuration["SwaggerDoc:Author:Url"]),
-                    }
-                });
+                SwaggerDoc doc  = SwaggerDoc.Factory.Create(Configuration, v);
+                options.SwaggerDoc(doc);
             }
         }
 
@@ -74,7 +62,7 @@ namespace TestSysplan.API
                })
                #endregion
                
-               #region Swagger               
+               #region Swagger                   
                .AddSwaggerGen(AddSwaggerDoc)
                #endregion
                
